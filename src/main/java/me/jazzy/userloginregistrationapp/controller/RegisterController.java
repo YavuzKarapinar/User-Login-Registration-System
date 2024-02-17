@@ -2,6 +2,7 @@ package me.jazzy.userloginregistrationapp.controller;
 
 import lombok.AllArgsConstructor;
 import me.jazzy.userloginregistrationapp.model.RegisterRequest;
+import me.jazzy.userloginregistrationapp.service.RegisterService;
 import me.jazzy.userloginregistrationapp.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,11 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class RegisterController {
 
-    private final UserService userService;
+    private final RegisterService registerService;
 
     @PostMapping
     public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(userService.saveUser(request));
+        return ResponseEntity.ok(registerService.register(request));
     }
 
 }

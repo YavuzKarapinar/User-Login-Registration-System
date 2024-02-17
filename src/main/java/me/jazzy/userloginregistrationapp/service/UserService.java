@@ -22,21 +22,13 @@ public class UserService implements UserDetailsService {
                         new UsernameNotFoundException("User with " + email + "not found"));
     }
 
-    public String saveUser(RegisterRequest request) {
+    public String saveUser(User user) {
 
-        boolean userExists = userRepository.findByEmail(request.getEmail())
+        boolean userExists = userRepository.findByEmail(user.getEmail())
                 .isPresent();
 
         if(userExists)
             throw new IllegalStateException("Email already taken");
-
-        User user = new User(
-                request.getFirstName(),
-                request.getLastName(),
-                request.getEmail(),
-                request.getPassword(),
-                UserRole.USER
-        );
 
         userRepository.save(user);
 
