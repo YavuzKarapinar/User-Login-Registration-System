@@ -1,6 +1,7 @@
 package me.jazzy.userloginregistrationapp.service;
 
 import lombok.AllArgsConstructor;
+import me.jazzy.userloginregistrationapp.exception.confirmationtoken.ConfirmationTokenNotFoundException;
 import me.jazzy.userloginregistrationapp.model.ConfirmationToken;
 import me.jazzy.userloginregistrationapp.repository.ConfirmationTokenRepository;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ public class ConfirmationTokenService {
     public void setConfirmedAt(ConfirmationToken confirmationToken) {
 
         getToken(confirmationToken.getToken())
-                .orElseThrow(() -> new IllegalStateException("Token not found"));
+                .orElseThrow(() -> new ConfirmationTokenNotFoundException("Token not found"));
 
         confirmationToken.setConfirmedAt(LocalDateTime.now());
         confirmationTokenRepository.save(confirmationToken);

@@ -1,6 +1,8 @@
 package me.jazzy.userloginregistrationapp.service;
 
 import lombok.AllArgsConstructor;
+import me.jazzy.userloginregistrationapp.exception.user.UserBadRequestException;
+import me.jazzy.userloginregistrationapp.exception.user.UserNotFoundException;
 import me.jazzy.userloginregistrationapp.model.ConfirmationToken;
 import me.jazzy.userloginregistrationapp.model.User;
 import me.jazzy.userloginregistrationapp.repository.UserRepository;
@@ -33,7 +35,7 @@ public class UserService implements UserDetailsService {
                 .isPresent();
 
         if(userExists)
-            throw new IllegalStateException("Email already taken");
+            throw new UserBadRequestException("Email already taken");
 
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
@@ -55,7 +57,7 @@ public class UserService implements UserDetailsService {
 
     public void enableUser(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User with " + email + "not found"));
+                .orElseThrow(() -> new UserNotFoundException("User with " + email + "not found"));
 
         user.setEnabled(true);
 
