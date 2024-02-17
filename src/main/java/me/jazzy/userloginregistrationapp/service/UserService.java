@@ -1,19 +1,22 @@
 package me.jazzy.userloginregistrationapp.service;
 
 import lombok.AllArgsConstructor;
-import me.jazzy.userloginregistrationapp.model.RegisterRequest;
+import me.jazzy.userloginregistrationapp.model.ConfirmationToken;
 import me.jazzy.userloginregistrationapp.model.User;
-import me.jazzy.userloginregistrationapp.model.UserRole;
 import me.jazzy.userloginregistrationapp.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 @Service
 @AllArgsConstructor
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
+    private final ConfirmationTokenService confirmationTokenService;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -32,7 +35,25 @@ public class UserService implements UserDetailsService {
 
         userRepository.save(user);
 
-        return "its working";
+        String token = UUID.randomUUID().toString();
+        ConfirmationToken confirmationToken = new ConfirmationToken(
+                token,
+                LocalDateTime.now(),
+                LocalDateTime.now().plusMinutes(15)
+        );
+
+        confirmationTokenService.saveConfirmationToken(confirmationToken);
+
+        return token;
+    }
+
+    public void enableUser(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User with " + email + "not found"));
+
+        user.setEnabled(true);
+
+        userRepository.save(user);
     }
 
 

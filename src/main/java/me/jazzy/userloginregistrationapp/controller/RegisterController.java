@@ -3,12 +3,8 @@ package me.jazzy.userloginregistrationapp.controller;
 import lombok.AllArgsConstructor;
 import me.jazzy.userloginregistrationapp.model.RegisterRequest;
 import me.jazzy.userloginregistrationapp.service.RegisterService;
-import me.jazzy.userloginregistrationapp.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/registration")
@@ -20,6 +16,11 @@ public class RegisterController {
     @PostMapping
     public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
         return ResponseEntity.ok(registerService.register(request));
+    }
+
+    @GetMapping("confirm")
+    public ResponseEntity<String> confirm(@RequestParam String token) {
+        return ResponseEntity.ok(registerService.confirmToken(token));
     }
 
 }
