@@ -5,6 +5,7 @@ import me.jazzy.userloginregistrationapp.model.ConfirmationToken;
 import me.jazzy.userloginregistrationapp.model.RegisterRequest;
 import me.jazzy.userloginregistrationapp.model.User;
 import me.jazzy.userloginregistrationapp.model.UserRole;
+import me.jazzy.userloginregistrationapp.validator.EmailValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,9 +16,15 @@ import java.time.LocalDateTime;
 public class RegisterService {
     private final UserService userService;
     private final ConfirmationTokenService confirmationTokenService;
+    private final EmailValidator emailValidator;
 
 
     public String register(RegisterRequest request) {
+        boolean isEmailValid = emailValidator.test(request.getEmail());
+
+        if(!isEmailValid)
+            throw new IllegalStateException("Email is not valid");
+
         User user = new User(
                 request.getFirstName(),
                 request.getLastName(),
