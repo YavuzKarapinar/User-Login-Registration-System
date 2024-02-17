@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import me.jazzy.userloginregistrationapp.model.ConfirmationToken;
 import me.jazzy.userloginregistrationapp.model.User;
 import me.jazzy.userloginregistrationapp.repository.UserRepository;
-import me.jazzy.userloginregistrationapp.security.PasswordEncoder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

@@ -5,7 +5,6 @@ import me.jazzy.userloginregistrationapp.model.ConfirmationToken;
 import me.jazzy.userloginregistrationapp.model.RegisterRequest;
 import me.jazzy.userloginregistrationapp.model.User;
 import me.jazzy.userloginregistrationapp.model.UserRole;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
