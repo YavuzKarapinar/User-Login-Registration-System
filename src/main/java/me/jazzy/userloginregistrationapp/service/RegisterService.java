@@ -4,11 +4,9 @@ import lombok.AllArgsConstructor;
 import me.jazzy.userloginregistrationapp.exception.confirmationtoken.ConfirmationTokenBadRequestException;
 import me.jazzy.userloginregistrationapp.exception.confirmationtoken.ConfirmationTokenNotFoundException;
 import me.jazzy.userloginregistrationapp.exception.user.UserBadRequestException;
-import me.jazzy.userloginregistrationapp.model.ConfirmationToken;
-import me.jazzy.userloginregistrationapp.model.RegisterRequest;
-import me.jazzy.userloginregistrationapp.model.User;
-import me.jazzy.userloginregistrationapp.model.UserRole;
+import me.jazzy.userloginregistrationapp.model.*;
 import me.jazzy.userloginregistrationapp.validator.EmailValidator;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +20,7 @@ public class RegisterService {
     private final EmailValidator emailValidator;
 
 
-    public String register(RegisterRequest request) {
+    public ResponseModel register(RegisterRequest request) {
         boolean isEmailValid = emailValidator.test(request.getEmail());
 
         if(!isEmailValid)
@@ -36,11 +34,16 @@ public class RegisterService {
                 UserRole.USER
         );
 
-        return userService.saveUser(user);
+        return new ResponseModel(
+                HttpStatus.OK.value(),
+                userService.saveUser(user),
+                LocalDateTime.now()
+        );
+
     }
 
     @Transactional
-    public String confirmToken(String token) {
+    public ResponseModel confirmToken(String token) {
         ConfirmationToken confirmationToken = confirmationTokenService.getToken(token)
                 .orElseThrow(() -> new ConfirmationTokenNotFoundException("Token not found"));
 
@@ -53,6 +56,10 @@ public class RegisterService {
         confirmationTokenService.setConfirmedAt(confirmationToken);
         userService.enableUser(confirmationToken.getUser().getEmail());
 
-        return confirmationToken.getUser().getEmail() + " Confirmed";
+        return new ResponseModel(
+                HttpStatus.OK.value(),
+                confirmationToken.getUser().getEmail() + " Confirmed",
+                LocalDateTime.now()
+        );
     }
 }
