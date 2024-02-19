@@ -18,12 +18,12 @@ public class RegisterService {
     private final UserService userService;
     private final ConfirmationTokenService confirmationTokenService;
     private final EmailValidator emailValidator;
-
+    private final EmailService emailService;
 
     public ResponseModel register(RegisterRequest request) {
         boolean isEmailValid = emailValidator.test(request.getEmail());
 
-        if(!isEmailValid)
+        if (!isEmailValid)
             throw new UserBadRequestException("Email is not valid");
 
         User user = new User(
@@ -34,9 +34,13 @@ public class RegisterService {
                 UserRole.USER
         );
 
+        String token = userService.saveUser(user);
+        String link = "http://localhost:8080/api/v1/registration/confirm?token=" + token;
+        emailService.send(user.getEmail(), "Confirm your email", textMessage(link));
+
         return new ResponseModel(
                 HttpStatus.OK.value(),
-                userService.saveUser(user),
+                token,
                 LocalDateTime.now()
         );
 
@@ -47,10 +51,10 @@ public class RegisterService {
         ConfirmationToken confirmationToken = confirmationTokenService.getToken(token)
                 .orElseThrow(() -> new ConfirmationTokenNotFoundException("Token not found"));
 
-        if(confirmationToken.getConfirmedAt() != null)
+        if (confirmationToken.getConfirmedAt() != null)
             throw new ConfirmationTokenBadRequestException("Token already confirmed");
 
-        if(confirmationToken.getExpiresAt().isBefore(LocalDateTime.now()))
+        if (confirmationToken.getExpiresAt().isBefore(LocalDateTime.now()))
             throw new ConfirmationTokenBadRequestException("Token already expired");
 
         confirmationTokenService.setConfirmedAt(confirmationToken);
@@ -61,5 +65,28 @@ public class RegisterService {
                 confirmationToken.getUser().getEmail() + " Confirmed",
                 LocalDateTime.now()
         );
+    }
+
+    private String textMessage(String link) {
+        return  "<!DOCTYPE html>\n" +
+                "<html lang=\"en\">\n" +
+                "<head>\n" +
+                "    <meta charset=\"UTF-8\">\n" +
+                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
+                "    <title>Hesap Onaylama Kodu</title>\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "    <p>Merhaba,</p>\n" +
+                "    <p>Hesabınızı doğrulamak için aşağıdaki bağlantıya tıklayabilir veya tarayıcınızdaki adres çubuğuna yapıştırabilirsiniz:</p>\n" +
+                "    <a href=\"" + link  + "\" style=\"color: #007bff; text-decoration: none;\">\n" +
+                "        <strong>[ONAY_KODU]</strong>\n" +
+                "    </a>\n" +
+                "    <p>Bu linki kullanarak hesabınızı doğrulayabilirsiniz.</p>\n" +
+                "    <p>Eğer bu işlemi siz yapmadıysanız, lütfen bu e-postayı dikkate almayınız.</p>\n" +
+                "    <br>\n" +
+                "    <p>Saygılarımla,<br>Yavuz Selim Karapınar</p>\n" +
+                "</body>\n" +
+                "</html>";
+
     }
 }
