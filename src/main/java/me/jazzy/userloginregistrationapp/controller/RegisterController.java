@@ -19,8 +19,8 @@ public class RegisterController {
         return new ResponseEntity<>(registerService.register(request), HttpStatus.OK);
     }
 
-    @GetMapping("confirm")
-    public ResponseEntity<String> confirm(@RequestParam String token) {
+    @GetMapping("confirm/{token}")
+    public ResponseEntity<String> confirm(@PathVariable String token) {
         return new ResponseEntity<>(registerService.confirmToken(token), HttpStatus.OK);
     }
 
